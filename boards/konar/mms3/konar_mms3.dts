@@ -1,0 +1,162 @@
+/dts-v1/;
+#include <st/f4/stm32f405Xg.dtsi>
+#include <st/f4/stm32f405rgtx-pinctrl.dtsi>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
+/ {
+	model = "STM32F405 Chainbus Board";
+	compatible = "konar,stm32f405-chainbus";
+
+	/* 
+	 * Zephyr Chosen Node
+	 * Connects System Console/Shell to USART3 and defines Memory boundaries
+	 */
+	chosen {
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+		zephyr,console = &cdc_acm_uart0;
+		zephyr,shell-uart = &cdc_acm_uart0;
+		zephyr,ccm = &ccm0;
+	};
+
+	aliases {
+		chainbus-i2c = &i2c2;
+		chainbus-spi = &spi3;
+		chainbus-uart = &usart3;
+	};
+
+	/*
+	 * HAT Selection Lines
+	 * Individual GPIO lines for 8 HAT positions (active-low selection)
+	 */
+	chainbus-hat-select {
+		compatible = "gpio-keys";
+
+		hat_sel_1: pos_1 {
+			gpios = <&gpioc 9 GPIO_ACTIVE_LOW>;
+			label = "HAT Select Pos 1 (addr3)";
+		};
+		hat_sel_2: pos_2 {
+			gpios = <&gpiob 5 GPIO_ACTIVE_LOW>;
+			label = "HAT Select Pos 2 (addr4)";
+		};
+		hat_sel_3: pos_3 {
+			gpios = <&gpioa 7 GPIO_ACTIVE_LOW>;
+			label = "HAT Select Pos 3 (addr0)";
+		};
+		hat_sel_4: pos_4 {
+			gpios = <&gpioa 6 GPIO_ACTIVE_LOW>;
+			label = "HAT Select Pos 4 (addr1)";
+		};
+		hat_sel_5: pos_5 {
+			gpios = <&gpioa 5 GPIO_ACTIVE_LOW>;
+			label = "HAT Select Pos 5 (addr2)";
+		};
+		hat_sel_6: pos_6 {
+			gpios = <&gpioc 6 GPIO_ACTIVE_LOW>;
+			label = "HAT Select Pos 6 (addr5)";
+		};
+		hat_sel_7: pos_7 {
+			gpios = <&gpioc 7 GPIO_ACTIVE_LOW>;
+			label = "HAT Select Pos 7 (addr6)";
+		};
+		hat_sel_8: pos_8 {
+			gpios = <&gpioc 8 GPIO_ACTIVE_LOW>;
+			label = "HAT Select Pos 8 (addr7)";
+		};
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		led0: led_0 {
+			gpios = <&gpiob 1 GPIO_ACTIVE_HIGH>;
+			label = "USER_LED_0";
+		};
+		led1: led_1 {
+			gpios = <&gpiob 0 GPIO_ACTIVE_HIGH>;
+			label = "USER_LED_1";
+		};
+		led2: led_2 {
+			gpios = <&gpioc 5 GPIO_ACTIVE_HIGH>;
+			label = "USER_LED_2";
+		};
+	};
+	buttons {
+		compatible = "gpio-keys";
+		button0: button_0 {
+			gpios = <&gpiod 2 GPIO_ACTIVE_LOW>;
+			label = "USER_BUTTON_0";
+		};
+	};
+};
+
+/*
+ * External Crystal & System Clock Configuration (8 MHz HSE -> 168 MHz SYSCLK)
+ */
+&clk_hse {
+	clock-frequency = <DT_FREQ_M(8)>;
+	status = "okay";
+};
+
+&pll {
+	div-m = <8>;
+	mul-n = <336>;
+	div-p = <2>;
+	div-q = <7>;
+	clocks = <&clk_hse>;
+	status = "okay";
+};
+
+&rcc {
+	clocks = <&pll>;
+	clock-frequency = <DT_FREQ_M(168)>;
+	ahb-prescaler = <1>;
+	apb1-prescaler = <4>;
+	apb2-prescaler = <2>;
+};
+
+/*
+ * USART3 - Main Chainbus Serial & Zephyr Console
+ * TX: PC10, RX: PC11
+ */
+&usart3 {
+	pinctrl-0 = <&usart3_tx_pc10 &usart3_rx_pc11>;
+	pinctrl-names = "default";
+	current-speed = <115200>;
+	status = "okay";
+};
+
+/*
+ * I2C2 - Chainbus I2C Line
+ * SCL: PB10, SDA: PB11
+ */
+&i2c2 {
+	pinctrl-0 = <&i2c2_scl_pb10 &i2c2_sda_pb11>;
+	pinctrl-names = "default";
+	clock-frequency = <I2C_BITRATE_FAST>;
+	status = "okay";
+};
+
+/*
+ * SPI3 - Chainbus SPI Line
+ * SCK: PB3, MISO: PB4, MOSI: PC12
+ * CS:  PA15 (Software Chip Select, Active Low)
+ * 
+ * Note: PB3, PB4, and PA15 claim JTAG pins (JTDO, NJTRST, JTDI).
+ * Flash and debug using SWD (PA13/PA14).
+ */
+&spi3 {
+	pinctrl-0 = <&spi3_sck_pb3 &spi3_miso_pb4 &spi3_mosi_pc12>;
+	pinctrl-names = "default";
+	cs-gpios = <&gpioa 15 GPIO_ACTIVE_LOW>;
+	status = "okay";
+};
+
+zephyr_udc0: &usbotg_fs {
+    status = "okay";
+	pinctrl-0 = <&usb_otg_fs_dm_pa11 &usb_otg_fs_dp_pa12>;
+    pinctrl-names = "default";
+    cdc_acm_uart0: cdc_acm_uart0 {
+        compatible = "zephyr,cdc-acm-uart";
+    };
+};

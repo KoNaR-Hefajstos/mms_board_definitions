@@ -1,0 +1,7 @@
+board:
+  name: "konar_mms3"
+  full_name: Mini-Moducard-System-3
+  vendor: konar
+  socs:
+    - name: stm32f405xx
+

@@ -1,0 +1,2 @@
+config BOARD_KONAR_MMS3
+	select SOC_STM32F405XX
