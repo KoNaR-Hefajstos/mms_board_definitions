@@ -4,4 +4,5 @@ board:
   vendor: konar
   socs:
     - name: stm32f405xx
+    - name: esp32c6
 
