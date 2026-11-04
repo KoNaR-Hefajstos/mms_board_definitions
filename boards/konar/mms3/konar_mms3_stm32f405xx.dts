@@ -5,7 +5,7 @@
 
 / {
 	model = "STM32F405 Chainbus Board";
-	compatible = "konar,stm32f405-chainbus";
+	compatible = "konar,mms3-stm32f405xx";
 
 	/* 
 	 * Zephyr Chosen Node
