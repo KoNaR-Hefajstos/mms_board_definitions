@@ -1,0 +1,144 @@
+/dts-v1/;
+#include <espressif/esp32c6/esp32c6.dtsi>
+#include "konar_mms3_esp32c6-pinctrl.dtsi"
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+#include <espressif/partitions_0x0_default.dtsi>
+
+#define ESP32C6_SLOT_CS_GPIOS \
+	<&gpio0  0 GPIO_ACTIVE_LOW>, /* XTAL_32K_P (GPIO0) */ \
+	<&gpio0  1 GPIO_ACTIVE_LOW>, /* XTAL_32K_N (GPIO1) */ \
+	<&gpio0  2 GPIO_ACTIVE_LOW>, /* GPIO2 */              \
+	<&gpio0  3 GPIO_ACTIVE_LOW>, /* GPIO3 */              \
+	<&gpio0 11 GPIO_ACTIVE_LOW>, /* GPIO11 */             \
+	<&gpio0 10 GPIO_ACTIVE_LOW>, /* GPIO10 */             \
+	<&gpio0  9 GPIO_ACTIVE_LOW>, /* GPIO9 */              \
+	<&gpio0  8 GPIO_ACTIVE_LOW>  /* GPIO8 */
+/ {
+    model = "Konar MMS3 ESP32-C6 Custom Devboard -- HPCore";
+    compatible = "konar,mms3-esp32c6";
+    aliases {
+        chainbus-i2c = &i2c0;
+        chainbus-spi = &spi2;
+        chainbus-uart = &uart1;
+    };
+
+    chosen {
+        zephyr,sram = &sramhp;
+        zephyr,console = &uart0;
+        zephyr,shell-uart = &uart0;
+        zephyr,sram = &sramhp;
+        zephyr,flash = &flash0;
+        zephyr,code-partition = &slot0_partition;
+    };
+    leds {
+        compatible = "gpio-leds";
+        status = "okay";
+        led0: led_0 {
+            gpios = <&baseboard_expander 7 GPIO_ACTIVE_HIGH>;
+            label = "UPSTREAM RJ45 RX LED";
+        };
+        led1: led_1 {
+            gpios = <&baseboard_expander 4 GPIO_ACTIVE_HIGH>;
+            label = "UPSTREAM RJ45 TX LED";
+        };
+        led2: led_2 {
+            gpios = <&baseboard_expander 5 GPIO_ACTIVE_HIGH>;
+            label = "DOWNSTREAM RJ45 RX LED";
+        };
+        led3: led_3 {
+            gpios = <&baseboard_expander 6 GPIO_ACTIVE_HIGH>;
+            label = "DOWNSTREAM RJ45 TX LED";
+        };
+    };
+
+    fix_led_0 {
+        compatible = "gpio-leds";
+        status = "okay";
+
+        fix_led0: led_0 {
+            gpios = <&baseboard_expander 4 GPIO_ACTIVE_HIGH>;
+            label = "FIX LED 1";
+        };
+        fix_led1: led_1 {
+            gpios = <&baseboard_expander 3 GPIO_ACTIVE_HIGH>;
+            label = "FIX LED 2";
+        };
+    };
+
+    fix_led_1 {
+        compatible = "gpio-leds";
+        status = "okay";
+
+        fix_led2: led_1 {
+            gpios = <&baseboard_expander 12 GPIO_ACTIVE_HIGH>;
+            label = "FIX LED 4";
+        };
+    };
+    buttons {
+        compatible = "gpio-keys";
+        status = "okay";
+
+        button0: button_0{
+            gpios = <&baseboard_expander 10 GPIO_ACTIVE_LOW>;
+            label = "USER_BUTTON_0";
+        }
+    }
+};
+
+&uart0 {
+    current-speed = <115200>;
+    pinctrl-0 = <&uart0_default>;
+    pinctrl-names = "default";
+    status = "okay";
+};
+&uart1 {
+    current-speed = <115200>;
+    pinctrl-0 = <&uart1_default>;
+    pinctrl-names = "default";
+    status = "okay";
+};
+
+&i2c0 {
+    clock-frequency = <I2C_BITRATE_FAST>;
+    pinctrl-0 = <&i2c0_default>;
+    pinctrl-names = "default";
+    status = "okay";
+    baseboard_expander: gpio@25 {
+        compatible = "nxp,pca9555";
+        reg = <0x25>;
+        gpio-controller;
+        #gpio-cells = <2>;
+        ngpios = <16>;
+        status = "okay";
+    };
+    baseboard_memory: eeprom@50 {
+        compatible = "atmel,at24";
+        reg = <0x50>;
+        size = <DT_SIZE_K(32)>;
+        pagesize = <64>;
+        address-width = <16>;
+        timeout = <5>;
+        status = "okay";
+    };
+};
+
+&spi2 {
+    #address-cells = <1>;
+    #size-cells = <0>;
+    pinctrl-0 = <&spim2_default>;
+    pinctrl-names = "default";
+    status = "okay";
+};
+&gpio0 {
+    status = "okay";
+};
+&flash0 {
+    reg = <0x0 DT_SIZE_M(16)>;
+    ranges = <0x0 0x0 DT_SIZE_M(16)>;
+};
+&wifi {
+    status = "okay";
+};
+&esp32_bt_hci {
+    status = "okay";
+};
