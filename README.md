@@ -10,7 +10,20 @@ Zephyr RTOS board definition module for **Konar Mini-Moducard-System (MMS)** boa
 
 ## Overview
 
-This west module provides Zephyr RTOS board support for the **Konar MMS3** (Mini-Moducard-System-3) — a compact STM32-based development board designed for the Chainbus ecosystem. It exposes standard peripheral interfaces (UART, I2C, SPI, USB) along with user LEDs, buttons, and HAT socket selection lines.
+This west module provides Zephyr RTOS board support for **Konar MMS3** (Mini-Moducard-System-3) boards. The MMS3 is a compact development board designed for the Chainbus ecosystem, exposing standard peripheral interfaces (UART, I2C, SPI, USB) along with user LEDs, buttons, and HAT socket selection lines.
+
+The module supports **two hardware targets**:
+
+| Target | Microcontroller | Build Target |
+|--------|----------------|--------------|
+| **MMS3 STM32F405XX** | STM32F405XX | `konar_mms3_stm32f405xx` |
+| **MMS3 ESP32-C6** | ESP32-C6 | `konar_mms3_esp32c6_hpcore`, `konar_mms3_esp32c6_lpcore` |
+
+See the individual board documentation for hardware-specific details:
+- [STM32F405XX Board](./docs/boards/konar_mms3_stm32f405xx/board-stm32f405xx.md)
+- [ESP32-C6 Board](./docs/boards/konar_mms3_esp32c6/board-esp32c6.md)
+
+---
 
 ## Installation
 
@@ -31,72 +44,39 @@ west update
 source zephyr/zephyr-env.sh
 ```
 
-## Board Definitions
+---
 
-### `konar/mms3`
+## Building
 
-| Property       | Value                                |
-|----------------|--------------------------------------|
-| **Full Name**  | Mini-Moducard-System-3               |
-| **Vendor**     | Konar                                |
-| **SoC**        | STM32F405XX                          |
-| **Core Clock** | 168 MHz (8 MHz HSE → PLL)            |
+Choose one of the two build targets below.
 
-#### Enabled Peripherals
-
-| Peripheral       | Instance | Pins                | Notes                          |
-|------------------|----------|---------------------|--------------------------------|
-| **Console / Shell** | USART3   | PC10 (TX), PC11 (RX) | 115200 baud, via USB CDC-ACM   |
-| **I2C**          | I2C2     | PB10 (SCL), PB11 (SDA) | Fast mode                     |
-| **SPI**          | SPI3     | PB3 (SCK), PB4 (MISO), PC12 (MOSI) | SWD debug via PA13/PA14       |
-| **USB OTG FS**   | OTG_FS   | PA11 (DM), PA12 (DP) | CDC ACM serial over USB        |
-
-#### LEDs
-
-| Label        | GPIO    | Active |
-|--------------|---------|--------|
-| `USER_LED_0` | PB1     | High   |
-| `USER_LED_1` | PB0     | High   |
-| `USER_LED_2` | PC5     | High   |
-
-#### Buttons
-
-| Label         | GPIO   | Active |
-|---------------|--------|--------|
-| `USER_BUTTON_0` | PD2  | Low    |
-
-#### HAT Socket Select Lines
-
-The board provides 8 GPIO lines for HAT position selection (active-low), each mapping to a 3-bit address:
-
-| Position | GPIO     | Address |
-|----------|----------|---------|
-| Pos 1    | PC9      | addr3   |
-| Pos 2    | PB5      | addr4   |
-| Pos 3    | PA7      | addr0   |
-| Pos 4    | PA6      | addr1   |
-| Pos 5    | PA5      | addr2   |
-| Pos 6    | PC6      | addr5   |
-| Pos 7    | PC7      | addr6   |
-| Pos 8    | PC8      | addr7   |
-
-#### Aliases
-
-| Alias              | Node   |
-|--------------------|--------|
-| `chainbus-i2c`     | `&i2c2` |
-| `chainbus-spi`     | `&spi3` |
-| `chainbus-uart`    | `&usart3` |
-
-## Building & Flashing
-
-Build a sample application for the MMS3 board:
+### STM32F405XX Target
 
 ```bash
-west build -b konar_mms3 samples/basic/blinky
+west build -b konar_mms3_stm32f405xx samples/basic/blinky
 ```
 
-Flash via the Blackmagic Probe (default runner configured in `board.cmake`):
+### ESP32-C6 Targets
+
+**HP Core (High Performance Core):**
+
+```bash
+west build -b konar_mms3_esp32c6_hpcore samples/basic/blinky
+```
+
+**LP Core (Low Power Core):**
+
+```bash
+west build -b konar_mms3_esp32c6_lpcore samples/basic/blinky
+```
+
+---
+
+## Flashing
+
+### STM32F405XX
+
+Flashes via the Blackmagic Probe (default runner configured in `board.cmake`):
 
 ```bash
 west flash
@@ -110,19 +90,15 @@ west flash --runner openocd
 
 > NOTE: The flasher may not work.
 
-## Device Tree Source
+### ESP32-C6
 
-The board is defined in `boards/konar/mms3/konar_mms3.dts`, which includes the STM32F405XG SoC DTSI and pin-control definitions. Clock configuration sets up an 8 MHz external crystal to derive the 168 MHz system clock via PLL.
+Flashing uses OpenOCD via the Espressif toolchain:
 
-## Configuration
+```bash
+west flash --runner openocd
+```
 
-The defconfig (`boards/konar/mms3/konar_mms3_defconfig`) enables:
-
-- `CONFIG_CLOCK_CONTROL` — 168 MHz system clock
-- `CONFIG_SERIAL`, `CONFIG_CONSOLE`, `CONFIG_UART_CONSOLE` — serial console support
-- `CONFIG_PINCTRL`, `CONFIG_GPIO`, `CONFIG_I2C`, `CONFIG_SPI` — peripheral drivers
-- `CONFIG_USB_DEVICE_STACK_NEXT` — USB device stack
-- `CONFIG_CDC_ACM_SERIAL_INITIALIZE_AT_BOOT` — USB CDC ACM serial
+---
 
 ## License
 
