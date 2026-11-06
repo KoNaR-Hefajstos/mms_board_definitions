@@ -15,7 +15,7 @@
             drive-open-drain;
         };
     };
-	spim2_default: spim2_default {
+    spim2_default: spim2_default {
         group1 {
             pinmux = <SPIM2_SCLK_GPIO18>,
                      <SPIM2_MOSI_GPIO19>,
@@ -31,7 +31,7 @@
             bias-pull-up;
         };
     };
-	uart1_default: uart0_default {
+    uart1_default: uart1_default {
         group1 {
             pinmux = <UART1_TX_GPIO5>;
         };

@@ -1,0 +1,20 @@
+/dts-v1/;
+#include <espressif/esp32c6/esp32c6_lpcore.dtsi>
+#include <espressif/partitions_0x0_default.dtsi>
+
+/ {
+    model = "Konar MMS3 ESP32-C6 Custom Devboard -- LPCore";
+    compatible = "konar,mms3-esp32c6";
+
+    chosen {
+        zephyr,flash = &flash0;
+        zephyr,sram = &ulp_ram;
+        zephyr,code-partition = &slot0_lpcore_partition;
+        zephyr,console = &uart0;
+        zephyr,shell-uart = &uart0;
+    };
+};
+&flash0 {
+    reg = <0x0 DT_SIZE_M(16)>;
+    ranges = <0x0 0x0 DT_SIZE_M(16)>;
+}
