@@ -78,11 +78,11 @@
         compatible = "gpio-keys";
         status = "okay";
 
-        button0: button_0{
+        button0: button_0 {
             gpios = <&baseboard_expander 10 GPIO_ACTIVE_LOW>;
             label = "USER_BUTTON_0";
-        }
-    }
+        };
+    };
 };
 
 &uart0 {
