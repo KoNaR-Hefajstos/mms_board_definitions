@@ -16,8 +16,8 @@ The module supports **two hardware targets**:
 
 | Target | Microcontroller | Build Target |
 |--------|----------------|--------------|
-| **MMS3 STM32F405XX** | STM32F405XX | `konar_mms3_stm32f405xx` |
-| **MMS3 ESP32-C6** | ESP32-C6 | `konar_mms3_esp32c6_hpcore`, `konar_mms3_esp32c6_lpcore` |
+| **MMS3 STM32F405XX** | STM32F405XX | `konar_mms3/stm32f405xx` |
+| **MMS3 ESP32-C6** | ESP32-C6 | `konar_mms3/esp32c6/hpcore`, `konar_mms3_esp32c6/lpcore` |
 
 You should not use the LP core on the ESP32-C6, unless you know what you are doing. It is intended for low-power applications and may not support all features of the board.
 
@@ -54,7 +54,7 @@ Choose one of the two build targets below.
 ### STM32F405XX Target
 
 ```bash
-west build -b konar_mms3_stm32f405xx samples/hello_world
+west build -b konar_mms3/stm32f405xx samples/hello_world
 ```
 
 ### ESP32-C6 Targets
@@ -62,13 +62,13 @@ west build -b konar_mms3_stm32f405xx samples/hello_world
 **HP Core (High Performance Core):**
 
 ```bash
-west build -b konar_mms3_esp32c6_hpcore samples/hello_world
+west build -b konar_mms3/esp32c6/hpcore samples/hello_world
 ```
 
 **LP Core (Low Power Core):**
 
 ```bash
-west build -b konar_mms3_esp32c6_lpcore samples/hello_world
+west build -b konar_mms3/esp32c6/lpcore samples/hello_world
 ```
 
 ---
