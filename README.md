@@ -75,28 +75,13 @@ west build -b konar_mms3/esp32c6/lpcore samples/hello_world
 
 ## Flashing
 
-### STM32F405XX
 
-Flashes via the Blackmagic Probe (default runner configured in `board.cmake`):
+Flashing uses the `probe-rs` runner for STM32F405XX boards and the `esptool` runner for ESP32-C6 boards.
+
+Usage:
 
 ```bash
 west flash
-```
-
-Or use SWD directly:
-
-```bash
-west flash --runner openocd
-```
-
-> NOTE: The flasher may not work.
-
-### ESP32-C6
-
-Flashing uses OpenOCD via the Espressif toolchain:
-
-```bash
-west flash --runner openocd
 ```
 
 ---
